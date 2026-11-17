@@ -1,0 +1,74 @@
+/* app/repos/repos.css — "Git 50k Repos" directory. Rides on the Ink & Ember
+   tokens defined by .cop in communities.css; only adds what the grid needs. */
+
+.cop .repos-hero { background: var(--grad-ink); color: #fff; padding: 2.4rem 0 2rem; position: relative; isolation: isolate; overflow: hidden; }
+.cop .repos-hero .wrap { position: relative; }
+.cop .repos-hero .wrap::before { content: ""; position: absolute; inset: -60% -10% auto auto; width: 680px; height: 680px; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255,87,51,.5), transparent 70%), radial-gradient(closest-side at 30% 70%, rgba(51,85,255,.4), transparent 70%);
+  filter: blur(22px); animation: cop-aurora 15s ease-in-out infinite alternate; }
+.cop .repos-kicker { display: flex; align-items: center; gap: .5rem; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--lime); }
+.cop .repos-kicker i { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); }
+.cop .repos-hero h1 { font-size: clamp(2rem, 4.1vw, 3.4rem); font-weight: 800; line-height: 1.03; margin: .7rem 0 0; max-width: 19ch; color: #fff; letter-spacing: -.035em; }
+.cop .repos-hero h1 em { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400; font-size: 1.12em;
+  background: linear-gradient(90deg, #FFD23F, #FF9A3D 55%, #FF5733); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cop .repos-hero p { margin: .8rem 0 0; color: rgba(255,255,255,.72); max-width: 58ch; font-size: 1.02rem; }
+.cop .repos-stats { display: flex; gap: 1.6rem; margin-top: 1.3rem; font-family: var(--font-display); }
+.cop .repos-stats b { display: block; font-size: 1.5rem; line-height: 1; letter-spacing: -.02em; color: #fff; }
+.cop .repos-stats span { font-family: var(--font-body); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.5); }
+.cop .repos-hero .floor { font-size: .74rem; color: rgba(255,255,255,.45); margin-top: .9rem; }
+
+.cop .filters .rowlab { font-size: .64rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: .45rem; }
+.cop .filters .rowlab b { color: var(--accent); }
+.cop .chips { display: flex; gap: .4rem; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: -2px; }
+.cop .chips::-webkit-scrollbar { display: none; }
+.cop .r-chip { flex: none; display: inline-flex; align-items: center; gap: .4rem; padding: .48rem .8rem; border-radius: 999px; background: #fff; border: 1.5px solid var(--line); font-size: .85rem; font-weight: 600; color: var(--ink-2); transition: all .22s var(--ease); }
+.cop .r-chip .e { font-size: .98rem; }
+.cop .r-chip .n { font-weight: 500; color: var(--muted); font-size: .74rem; }
+.cop .r-chip:hover { border-color: var(--ink); transform: translateY(-1px); }
+.cop .r-chip-use { padding: .55rem .95rem; font-size: .88rem; }
+.cop .r-chip-use:hover { border-color: var(--accent); }
+.cop .r-chip-use[aria-pressed="true"] { background: var(--grad); border-color: transparent; color: #fff; box-shadow: 0 10px 24px -14px rgba(255,87,51,.9); }
+.cop .r-chip-use[aria-pressed="true"] .n { color: rgba(255,255,255,.8); }
+.cop .r-chip-ai { border-color: var(--accent-2); }
+.cop .r-chip[aria-pressed="true"] { background: var(--black); color: #fff; border-color: var(--black); }
+.cop .r-chip[aria-pressed="true"] .n { color: rgba(255,255,255,.7); }
+.cop #toggle-kind { background: none; border: 0; color: var(--ink-2); font-size: .76rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; padding: 0; align-self: flex-start; }
+.cop #toggle-kind:hover { color: var(--accent-ink); }
+.cop #kindbox { display: flex; flex-direction: column; gap: .4rem; }
+.cop .tools { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; padding-top: .15rem; }
+.cop .tools select { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23857F8C' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right .8rem center;
+  border: 1.5px solid var(--line); border-radius: 999px; padding: .45rem 2rem .45rem .85rem; font-size: .82rem; font-weight: 600; color: var(--ink-2); }
+.cop .tools .tog { display: inline-flex; align-items: center; gap: .45rem; background: #fff; border: 1.5px solid var(--line); border-radius: 999px; padding: .45rem .85rem; font-size: .82rem; font-weight: 600; color: var(--ink-2); }
+.cop .tools .tog input { accent-color: var(--accent); }
+.cop .tools .spacer { flex: 1; }
+.cop .tools .cnt { font-size: .82rem; font-weight: 700; color: var(--ink); }
+.cop #reset { background: none; border: 0; color: var(--accent); font-size: .82rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+.cop .repos-main { padding: 1.4rem 0 4rem; background-image: radial-gradient(rgba(var(--ink-rgb), .07) 1px, transparent 1px); background-size: 22px 22px; }
+.cop #blurb { color: var(--ink-2); font-size: .95rem; margin: .2rem 0 1.1rem; }
+.cop .repos-main .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: .9rem; }
+.cop .r-card { background: #fff; border: 1px solid var(--line-2); border-radius: 18px; padding: 1.05rem 1.1rem 1rem; display: flex; flex-direction: column; gap: .55rem; transition: transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s; }
+.cop .r-card:hover { transform: translateY(-3px); box-shadow: 0 22px 40px -28px rgba(0,0,0,.5); border-color: var(--accent-2); }
+.cop .r-top { display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
+.cop .r-cat { font-size: .68rem; font-weight: 800; color: var(--ink-2); background: var(--paper); border-radius: 999px; padding: .26rem .6rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cop .r-stars { font-family: var(--font-display); font-weight: 800; font-size: .92rem; color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: .2rem .55rem; white-space: nowrap; }
+.cop .r-card h3 { font-size: 1.04rem; font-weight: 800; line-height: 1.2; word-break: break-word; margin: 0; }
+.cop .r-card h3 .o { color: var(--muted); font-weight: 600; }
+.cop .r-card p { margin: 0; font-size: .88rem; line-height: 1.5; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.cop .r-uses { display: flex; flex-wrap: wrap; gap: .3rem; }
+.cop .r-use { font-size: .68rem; font-weight: 700; color: var(--accent-ink); background: var(--accent-soft); border: 0; border-radius: 999px; padding: .22rem .55rem; }
+.cop .r-use:hover { background: var(--accent); color: #fff; }
+.cop .r-meta { display: flex; flex-wrap: wrap; gap: .5rem .8rem; font-size: .74rem; color: var(--muted); font-weight: 600; }
+.cop .r-lang { display: inline-flex; align-items: center; gap: .32rem; }
+.cop .r-lang i { width: 9px; height: 9px; border-radius: 50%; background: var(--cobalt); }
+.cop .r-live { color: #1F8A4C; }
+.cop .r-stale { color: #B07A14; }
+.cop .r-links { display: flex; gap: .45rem; margin-top: auto; padding-top: .5rem; }
+.cop .r-btn { display: inline-flex; align-items: center; gap: .35rem; padding: .48rem .85rem; border-radius: 999px; font-size: .82rem; font-weight: 700; background: var(--black); color: #fff; transition: background .2s, transform .2s var(--ease); }
+.cop .r-btn:hover { background: var(--accent-ink); transform: translateY(-1px); }
+.cop .r-btn.ghost { background: transparent; border: 1.5px solid var(--line); color: var(--ink-2); }
+.cop .r-btn.ghost:hover { border-color: var(--ink); color: var(--ink); }
+.cop #more { display: block; margin: 1.6rem auto 0; padding: .75rem 1.6rem; border-radius: 999px; background: var(--black); color: #fff; font-weight: 700; font-size: .9rem; border: 0; }
+.cop #more:hover { background: var(--accent-ink); }
+.cop #empty { text-align: center; padding: 3rem 0; color: var(--muted); }
+@media (max-width: 520px) { .cop .repos-stats { gap: 1rem; } .cop .repos-stats b { font-size: 1.25rem; } }

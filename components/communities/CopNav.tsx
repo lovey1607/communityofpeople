@@ -28,6 +28,7 @@ export function CopNav() {
           <Link href="/communities/gurgaon/running">Run clubs</Link>
           <Link href="/communities/gurgaon/sports">Sports</Link>
           <Link href="/communities/gurgaon/books">Reading</Link>
+          <Link href="/repos" aria-current={cur('/repos')}>Git 50k Repos</Link>
           <Link href="/communities/corporate-events" aria-current={cur('/communities/corporate-events')} className="teams">Corporate events <span className="new">new</span></Link>
         </nav>
         <Link href="/communities/submit" className="cop-btn cop-btn-primary cop-btn-sm">List a community</Link>
