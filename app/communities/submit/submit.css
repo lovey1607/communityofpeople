@@ -1,0 +1,25 @@
+/* app/communities/submit/submit.css — the short "list your community" page. */
+.cop .sub { background: var(--paper); padding: clamp(2rem, 6vw, 4rem) 0 4rem;
+  background-image: radial-gradient(rgba(var(--ink-rgb), .07) 1px, transparent 1px); background-size: 22px 22px; }
+.cop .sub-wrap { max-width: 640px; }
+.cop .sub-kicker { font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); margin: 0 0 .6rem; }
+.cop .sub h1 { font-size: clamp(1.9rem, 5vw, 2.9rem); font-weight: 800; letter-spacing: -.035em; line-height: 1.05; margin: 0; }
+.cop .sub h1 em { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400; font-size: 1.1em;
+  background: linear-gradient(90deg, #FF5733, #FF9A3D); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cop .sub-lead { margin: .9rem 0 1.6rem; font-size: 1.02rem; line-height: 1.6; color: var(--ink-2); }
+.cop .sub-cta { display: inline-flex; align-items: center; gap: .6rem; flex-wrap: wrap; padding: .95rem 1.5rem; border-radius: 999px;
+  background: #25D366; color: #06331A; font-weight: 800; font-size: 1.05rem; box-shadow: 0 16px 34px -16px rgba(37, 211, 102, .9);
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+.cop .sub-cta:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -16px rgba(37, 211, 102, 1); }
+.cop .sub-wa { font-size: 1.15rem; }
+.cop .sub-num { font-family: var(--font-display); font-weight: 700; background: rgba(0,0,0,.12); border-radius: 999px; padding: .15rem .6rem; font-size: .92rem; }
+.cop .sub-alt { margin: .9rem 0 0; font-size: .86rem; color: var(--ink-2); }
+.cop .sub-alt a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
+.cop .sub-h2 { margin: 2.4rem 0 .9rem; font-size: 1.05rem; font-weight: 800; }
+.cop .sub-need { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
+.cop .sub-need li { display: flex; gap: .9rem; align-items: baseline; background: #fff; border: 1px solid var(--line-2); border-radius: 14px; padding: .7rem .9rem; }
+.cop .sub-need b { flex: none; width: 92px; font-weight: 800; font-size: .84rem; }
+.cop .sub-need span { font-size: .88rem; color: var(--ink-2); line-height: 1.5; }
+.cop .sub-foot { margin: 1.4rem 0 0; font-size: .84rem; color: var(--muted); line-height: 1.6; }
+.cop .sub-foot a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 520px) { .cop .sub-need li { flex-direction: column; gap: .15rem; } .cop .sub-need b { width: auto; } .cop .sub-cta { width: 100%; justify-content: center; } }
