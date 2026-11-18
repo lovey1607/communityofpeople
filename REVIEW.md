@@ -216,3 +216,12 @@ The data shape maps 1:1 to those tables when you're ready.
 
 Vercel deploys on merge to `main` only, so pushing the branch alone is safe; open a PR
 from it when you're happy.
+
+## v12 — 18 Nov 2026
+- **Location bug fixed**: a "near me" spot saved in one city no longer follows you to another (Gurgaon was showing Singapore). The hero now has its own city search (city, country or region; Enter jumps).
+- **New pages**: `/creators` (66 communities run by creators and influencers, e.g. Deepika Narayan Bhardwaj's Telegram) and `/causes` (33 intent-based groups: consumer complaints, civic, patient groups, plus "Start an intent group"). Sports and Reading were removed from the nav.
+- **Research beyond Meetup**: 138 city communities from WhatsApp, Telegram, Discord, Reddit, X and Instagram (`research/social/*.json`, built by `scripts/build-social-research.ts`, drops logged in `research/social/dropped.txt`).
+- **Verified seal**: shown only when we opened the join link ourselves within 60 days. It's our own check, not a platform badge.
+- **Startup map**: filters for India / outside India, country, city and top-city chips; all filters live in the URL.
+- **Brand**: new logo, favicon and OG image (`public/brand/`).
+- **Security**: see `research/SECURITY-REVIEW.md`.

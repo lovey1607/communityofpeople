@@ -9,6 +9,7 @@ import { COMMUNITIES_INDIA } from '@/data/communities-india';
 import { COMMUNITIES_DISCOVERED } from '@/data/communities-discovered';
 import { COMMUNITIES_MEETUP_NOV } from '@/data/communities-meetup-nov';
 import { COMMUNITIES_WORLD } from '@/data/communities-world';
+import { COMMUNITIES_SOCIAL } from '@/data/communities-social';
 import { UPDATES, REMOVED, VERIFIED_ON } from '@/data/communities-updates';
 
 /** Apply the dated verification layer (data/communities-updates.ts) to seed rows. */
@@ -32,6 +33,7 @@ export const COMMUNITIES: Community[] = [
   ...COMMUNITIES_DISCOVERED,
   ...COMMUNITIES_MEETUP_NOV,
   ...COMMUNITIES_WORLD,
+  ...COMMUNITIES_SOCIAL,
 ];
 
 export function bySlug(slug: string): Community | undefined {

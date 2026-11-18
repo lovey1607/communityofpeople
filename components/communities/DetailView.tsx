@@ -7,6 +7,7 @@ import { CATEGORY_META, PLATFORM_LABEL, similarTo, slugForCity, type Community, 
 import { Mark } from './Mark';
 import { CardPhoto } from './CardPhoto';
 import { SimilarGrid } from './SimilarGrid';
+import { VerifiedBadge } from './VerifiedBadge';
 
 function fmtDate(iso: string) {
   const d = new Date(iso);
@@ -33,7 +34,7 @@ export function DetailView({ c, all }: { c: Community; all: Community[] }) {
 
   return (
     <article className="cop-detail">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="wrap">
         <nav className="cop-crumbs" aria-label="Breadcrumb">
           <Link href="/communities">Communities</Link><span>/</span>
@@ -47,7 +48,7 @@ export function DetailView({ c, all }: { c: Community; all: Community[] }) {
             <div className="head">
               <Mark c={c} size={72} />
               <div>
-                <h1>{c.name}</h1>
+                <h1>{c.name} <VerifiedBadge c={c} size={26} label /></h1>
                 <p className="lead">{c.tagline}</p>
               </div>
             </div>

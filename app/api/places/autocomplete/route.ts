@@ -6,6 +6,8 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/server/ratelimit';
+import { clientIp } from '@/lib/server/http';
 
 export interface PlaceSuggestion {
   place_id: string;
@@ -280,6 +282,11 @@ function toTitleCase(str: string): string {
 }
 
 export async function GET(request: NextRequest) {
+  // Each call spends the Google Maps quota, so cap it per IP (fails open if the DB is down).
+  try {
+    const rl = await checkRateLimit(RATE_LIMITS.places, clientIp(request));
+    if (!rl.allowed) return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } });
+  } catch { /* limiter unavailable */ }
   try {
     const { searchParams } = new URL(request.url);
     const rawInput = (searchParams.get('input') || searchParams.get('q') || '').trim();

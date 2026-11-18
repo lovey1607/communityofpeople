@@ -15,6 +15,27 @@ export const ONLINE_CITY = 'Online';
 // client components can import helpers without shipping every listing.
 export { CATEGORY_META };
 
+// ─── Verified badge ──────────────────────────────────────────
+/** Days a check stays fresh. After that the badge drops until someone re-checks. */
+export const VERIFY_FRESH_DAYS = 60;
+/**
+ * "Verified" on Community of People means: we opened the organiser's own page or
+ * the join link within the last 60 days and saw it working and active. It is our
+ * check, not WhatsApp/Instagram/Telegram's own verification.
+ */
+export function isVerified(c: Pick<Community, 'status' | 'source' | 'linkCheck'>, now = Date.now()): boolean {
+  if (c.status !== 'approved') return false;
+  if (c.linkCheck && !c.linkCheck.ok) return false;
+  const cutoff = new Date(now - VERIFY_FRESH_DAYS * 86400000).toISOString().slice(0, 10);
+  return (c.linkCheck?.on ?? c.source.verifiedOn) >= cutoff;
+}
+export function verifiedTitle(c: Pick<Community, 'source' | 'linkCheck' | 'join'>): string {
+  const on = c.linkCheck?.on ?? c.source.verifiedOn;
+  const bits = [`Verified by Community of People on ${on}`, `${PLATFORM_LABEL[c.join.platform] ?? 'Join'} link checked`];
+  if (c.linkCheck?.members) bits.push(`${c.linkCheck.members} members`);
+  return bits.join(' · ');
+}
+
 // ─── Brand ───────────────────────────────────────────────────
 export const BRAND = {
   name: 'Community of People',
@@ -276,7 +297,7 @@ export function whereLabel(c: Pick<Community, 'city' | 'area' | 'mode'>): string
 }
 
 /** Join-platform options shown in the Filters panel. */
-export const JOIN_FILTER_OPTIONS: JoinPlatform[] = ['whatsapp', 'telegram', 'instagram', 'meetup', 'website', 'discord', 'reddit', 'facebook', 'hangout', 'other'];
+export const JOIN_FILTER_OPTIONS: JoinPlatform[] = ['whatsapp', 'telegram', 'instagram', 'meetup', 'website', 'discord', 'reddit', 'facebook', 'x', 'hangout', 'other'];
 
 // ─── URL state ───────────────────────────────────────────────
 const KEYS: (keyof Filters)[] = ['q', 'category', 'city', 'gender', 'beginner', 'price', 'events', 'cadence', 'size', 'join', 'mode', 'age', 'verified', 'sort'];
@@ -368,5 +389,5 @@ export function similarTo(c: Community, n: number, list: Community[]): Community
 export const PLATFORM_LABEL: Record<JoinPlatform, string> = {
   whatsapp: 'WhatsApp', instagram: 'Instagram', meetup: 'Meetup', luma: 'Luma', misfits: 'Misfits',
   strava: 'Strava', website: 'Website', telegram: 'Telegram', hangout: 'hangout.in',
-  discord: 'Discord', reddit: 'Reddit', facebook: 'Facebook', other: 'Link / form',
+  discord: 'Discord', reddit: 'Reddit', facebook: 'Facebook', x: 'X', other: 'Link / form',
 };

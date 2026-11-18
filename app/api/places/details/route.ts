@@ -16,6 +16,8 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/server/ratelimit';
+import { clientIp } from '@/lib/server/http';
 import { GURUGRAM_PRESEEDED_VENUES } from '@/data/venues';
 
 export const dynamic = 'force-dynamic';
@@ -40,6 +42,11 @@ function directoryFactsFor(placeId: string): PlaceFacts | null {
 }
 
 export async function GET(request: NextRequest) {
+  // Each call spends the Google Maps quota, so cap it per IP (fails open if the DB is down).
+  try {
+    const rl = await checkRateLimit(RATE_LIMITS.places, clientIp(request));
+    if (!rl.allowed) return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } });
+  } catch { /* limiter unavailable */ }
   try {
     const { searchParams } = new URL(request.url);
     const placeId = searchParams.get('placeId') || searchParams.get('place_id');

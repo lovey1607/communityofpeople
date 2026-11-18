@@ -143,7 +143,7 @@ await ctx.close();
 // geolocation denied → graceful
 [ctx, p] = await page({ width: 1400, height: 900 });
 await p.goto(`${B}/communities`, { waitUntil: 'load' }); await p.waitForTimeout(1200);
-await p.click('.cop-ask button:has-text("Use my location")'); await p.waitForTimeout(1000);
+await p.click('.cop-ask button.cop-locbtn'); await p.waitForTimeout(1000);
 ok('geolocation denied → location picker opens, no crash', await p.isVisible('.cop-locpick'));
 await ctx.close();
 
@@ -201,6 +201,28 @@ await p.goto(`${B}/communities/w-singapore-gdg-singapore`, { waitUntil: 'load' }
 ok('world: detail page links to the Meetup group', (await p.getAttribute('.cop-joinbox a.cop-btn', 'href'))?.startsWith('https://www.meetup.com/gdg-singapore'));
 ok('world: city slugs with accents work (/communities/sao-paulo)', (await p.goto(`${B}/communities/sao-paulo`)).status() === 200);
 ok('world: space-separated city links work (/communities/new york)', (await p.goto(`${B}/communities/new%20york`)).status() === 200);
+await ctx.close();
+
+// ─── v12: hero city search, stale-origin fix, new pages ───
+[ctx, p] = await page({ width: 1400, height: 900 });
+await p.goto(`${B}/communities?city=Gurgaon`, { waitUntil: 'load' }); await p.waitForTimeout(800);
+await p.evaluate(() => localStorage.setItem('cop:origin', JSON.stringify({ lat: 1.3521, lng: 103.8198, label: 'Singapore (centre)', kind: 'city' })));
+await p.goto(`${B}/communities?city=Gurgaon`, { waitUntil: 'load' }); await p.waitForTimeout(1200);
+ok('v12: a spot saved in another city does not follow you (no "Singapore" near Gurgaon)', !(await p.textContent('main')).includes('Singapore (centre)'));
+await p.fill('.cop-cityjump input', 'japan'); await p.waitForTimeout(300);
+ok('v12: hero city search matches countries', await p.isVisible('.cop-cityjump li button:has-text("Tokyo")'));
+await p.keyboard.press('Enter'); await p.waitForURL(/city=Tokyo/); await p.waitForTimeout(1200);
+ok('v12: Enter in hero search jumps to the city', (await p.textContent('.cop-hero h1')).includes('Tokyo'));
+await p.goto(`${B}/creators`, { waitUntil: 'load' }); await p.waitForTimeout(800);
+ok('v12: /creators lists communities', (await p.$$eval('.dir-card', (e) => e.length)) >= 20);
+ok('v12: creator rows carry the verified seal', (await p.$$eval('.dir-card .cop-verified', (e) => e.length)) >= 10);
+await p.fill('.dir-q input', 'Deepika'); await p.waitForTimeout(300);
+ok('v12: creators search finds Deepika Narayan Bhardwaj (Telegram)', (await p.textContent('.dir-grid')).includes('DNB'));
+await p.goto(`${B}/causes`, { waitUntil: 'load' }); await p.waitForTimeout(800);
+ok('v12: /causes lists intent groups + start-a-group CTA', (await p.$$eval('.dir-card', (e) => e.length)) >= 10 && await p.isVisible('a:has-text("Start an intent group")'));
+await p.goto(`${B}/startups?scope=india`, { waitUntil: 'load' }); await p.waitForTimeout(800);
+ok('v12: startup map filters by location from the URL', await p.isVisible('.r-chip[aria-pressed="true"]:has-text("India")'));
+ok('v12: nav swaps Sports/Reading for Creators/Causes', await p.isVisible('.cop-nav-links a:has-text("Creators")') && !(await p.isVisible('.cop-nav-links a:has-text("Reading")')));
 await ctx.close();
 
 await b.close();

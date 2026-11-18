@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { CITY_CENTRE, CATEGORY_META, type Community, type CommunityCategory, type JoinPlatform } from '@/data/communities';
 
 export const CATEGORIES = Object.keys(CATEGORY_META) as [CommunityCategory, ...CommunityCategory[]];
-export const PLATFORMS = ['whatsapp', 'telegram', 'instagram', 'meetup', 'luma', 'misfits', 'strava', 'website', 'hangout', 'discord', 'reddit', 'facebook', 'other'] as const satisfies readonly JoinPlatform[];
+export const PLATFORMS = ['whatsapp', 'telegram', 'instagram', 'meetup', 'luma', 'misfits', 'strava', 'website', 'hangout', 'discord', 'reddit', 'facebook', 'x', 'other'] as const satisfies readonly JoinPlatform[];
 export const CITIES = [...Object.keys(CITY_CENTRE), 'Online'];
 export const PRICING = ['free', 'paid', 'pay-per-event', 'membership', 'unknown'] as const;
 

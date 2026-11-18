@@ -4,7 +4,7 @@
 // with live count badges; tap one to filter by how you join. Icons are
 // generic glyphs in each app's colour family — no brand logos.
 import { motion, useReducedMotion } from 'framer-motion';
-import { MessageCircle, Send, Camera, Gamepad2, Users, MessagesSquare, ThumbsUp, Globe, Link2, Sparkles } from 'lucide-react';
+import { MessageCircle, Send, Camera, Gamepad2, Users, MessagesSquare, ThumbsUp, Globe, Link2, Sparkles, AtSign } from 'lucide-react';
 import type { JoinPlatform } from '@/lib/communities';
 import { burst } from './CursorBuddy';
 
@@ -18,6 +18,7 @@ export const DOCK: Tile[] = [
   { id: 'discord', label: 'Discord', Icon: Gamepad2, bg: 'linear-gradient(145deg,#9AA5FF,#5865F2)', emoji: '🎮' },
   { id: 'reddit', label: 'Reddit', Icon: MessagesSquare, bg: 'linear-gradient(145deg,#FFA463,#FF4500)', emoji: '🗨️' },
   { id: 'facebook', label: 'Facebook', Icon: ThumbsUp, bg: 'linear-gradient(145deg,#6AA8FF,#1857D6)', emoji: '👍' },
+  { id: 'x', label: 'X', Icon: AtSign, bg: 'linear-gradient(145deg,#6B6B6B,#111)', emoji: '𝕏' },
   { id: 'website', label: 'Website', Icon: Globe, bg: 'linear-gradient(145deg,#B9F27A,#3F9C2F)', emoji: '🌐' },
   { id: 'other', label: 'Forms & apps', Icon: Link2, bg: 'linear-gradient(145deg,#D7C6FF,#7C3AED)', emoji: '🔗' },
 ];

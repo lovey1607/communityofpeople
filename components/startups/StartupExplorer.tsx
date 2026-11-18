@@ -1,7 +1,7 @@
 'use client';
 // components/startups/StartupExplorer.tsx — the startup capital & communities map.
 // Static dataset compiled from public sources; filtering is client-side.
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import data from '@/data/startup-map.json';
 
 type Entry = {
@@ -30,7 +30,39 @@ export function StartupExplorer() {
   const [sector, setSector] = useState('');
   const [city, setCity] = useState('');
   const [sourced, setSourced] = useState(false);
+  const [scope, setScope] = useState<'' | 'india' | 'global'>('');
+  const [country, setCountry] = useState('');
   const [shown, setShown] = useState(PAGE);
+  const [ready, setReady] = useState(false);
+
+  // Filters live in the URL (?city=Bengaluru&type=angel…) so a filtered view can be shared.
+  useEffect(() => {
+    const p = new URLSearchParams(location.search);
+    setQ(p.get('q') ?? ''); setType(p.get('type') ?? ''); setStage(p.get('stage') ?? ''); setSector(p.get('sector') ?? '');
+    setCity(p.get('city') ?? ''); setCountry(p.get('country') ?? ''); setSourced(p.get('cheque') === '1');
+    const sc = p.get('scope'); setScope(sc === 'india' || sc === 'global' ? sc : '');
+    setReady(true);
+  }, []);
+  useEffect(() => {
+    if (!ready) return;
+    const p = new URLSearchParams();
+    const put = (k: string, v: string) => { if (v) p.set(k, v); };
+    put('q', q); put('type', type); put('stage', stage); put('sector', sector); put('scope', scope); put('country', country); put('city', city); if (sourced) p.set('cheque', '1');
+    const qs = p.toString();
+    history.replaceState(history.state, '', `${location.pathname}${qs ? `?${qs}` : ''}`);
+  }, [ready, q, type, stage, sector, scope, country, city, sourced]);
+
+  const inScope = (e: Entry) => (scope === 'india' ? e.co === 'India' : scope === 'global' ? e.co !== 'India' : true);
+  const countries = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const e of ENTRIES) if (inScope(e) && e.co) m.set(e.co, (m.get(e.co) ?? 0) + 1);
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }, [scope]); // eslint-disable-line react-hooks/exhaustive-deps
+  const cityCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const e of ENTRIES) if (inScope(e) && (!country || e.co === country) && e.c) m.set(e.c, (m.get(e.c) ?? 0) + 1);
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }, [scope, country]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const list = useMemo(() => {
     const terms = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -38,6 +70,8 @@ export function StartupExplorer() {
       if (type && e.t !== type) return false;
       if (stage && !e.st.includes(stage)) return false;
       if (sector && !e.sc.includes(sector)) return false;
+      if (!inScope(e)) return false;
+      if (country && e.co !== country) return false;
       if (city && e.c !== city) return false;
       if (sourced && !e.q) return false;
       if (terms.length) {
@@ -46,11 +80,11 @@ export function StartupExplorer() {
       }
       return true;
     });
-  }, [q, type, stage, sector, city, sourced]);
+  }, [q, type, stage, sector, city, sourced, scope, country]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const anyFilter = Boolean(q || type || stage || sector || city || sourced);
+  const anyFilter = Boolean(q || type || stage || sector || city || sourced || scope || country);
   const reset = () => {
-    setQ(''); setType(''); setStage(''); setSector(''); setCity(''); setSourced(false); setShown(PAGE);
+    setQ(''); setType(''); setStage(''); setSector(''); setCity(''); setSourced(false); setScope(''); setCountry(''); setShown(PAGE);
   };
   const active = type ? T[type] : null;
 
@@ -70,6 +104,19 @@ export function StartupExplorer() {
                 onClick={() => { setType((c) => (c === t.key ? '' : t.key)); setShown(PAGE); }}
               >
                 <span className="e">{t.emoji}</span>{t.label}<span className="n">{t.n}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="rowlab">Where</div>
+          <div className="chips">
+            {([['', '🌏 Everywhere'], ['india', '🇮🇳 India'], ['global', '🌍 Outside India']] as const).map(([k, l]) => (
+              <button key={k || 'all'} type="button" className="r-chip" aria-pressed={scope === k}
+                onClick={() => { setScope(k); setCountry(''); setCity(''); setShown(PAGE); }}>{l}</button>
+            ))}
+            {cityCounts.slice(0, 10).map(([c, n]) => (
+              <button key={c} type="button" className="r-chip" aria-pressed={city === c} onClick={() => { setCity((x) => (x === c ? '' : c)); setShown(PAGE); }}>
+                📍 {c}<span className="n">{n}</span>
               </button>
             ))}
           </div>
@@ -94,9 +141,13 @@ export function StartupExplorer() {
               <option value="">Any sector</option>
               {SECTORS.map((s) => <option key={s.key} value={s.key}>{s.label} ({s.n})</option>)}
             </select>
+            <select aria-label="Country" value={country} onChange={(e) => { setCountry(e.target.value); setCity(''); setShown(PAGE); }}>
+              <option value="">Any country</option>
+              {countries.map(([c, n]) => <option key={c} value={c}>{c} ({n})</option>)}
+            </select>
             <select aria-label="City" value={city} onChange={(e) => { setCity(e.target.value); setShown(PAGE); }}>
               <option value="">Any city</option>
-              {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              {(cityCounts.length ? cityCounts.map(([c]) => c) : CITIES).map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
             <label className="tog">
               <input type="checkbox" checked={sourced} onChange={(e) => { setSourced(e.target.checked); setShown(PAGE); }} />{' '}

@@ -12,6 +12,7 @@ import { Mark } from './Mark';
 import { CAT_EMOJI } from './emoji';
 import { CardPhoto } from './CardPhoto';
 import { priceLabel, audienceLabel, cadenceLabel } from './CommunityCard';
+import { VerifiedBadge } from './VerifiedBadge';
 
 type Dir = 'left' | 'right';
 type Props = { items: Scored[]; saved: Set<string>; onSave: (slug: string) => void; onToast: (m: string) => void; onExit: () => void };
@@ -134,7 +135,7 @@ function DeckCard({ c, i, saved, dir, onDecide, reduce }: { c: Scored; i: number
         {c.km != null && <span className="km">{formatKm(c.km)}</span>}
       </div>
       <div className="body">
-        <h3><Link href={`/communities/${c.slug}`} draggable={false}>{c.name}</Link>{saved && <Heart size={15} fill="currentColor" className="sv" />}</h3>
+        <h3><Link href={`/communities/${c.slug}`} draggable={false}>{c.name}</Link> <VerifiedBadge c={c} size={16} />{saved && <Heart size={15} fill="currentColor" className="sv" />}</h3>
         <p className="where"><MapPin size={12} /> {whereLabel(c)}{c.status === 'unverified' && <span className="unv-inline"> · unverified</span>}</p>
         <p className="tag">{c.tagline}</p>
         <ul className="facts">

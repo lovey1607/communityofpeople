@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { BRAND } from '@/lib/communities';
+import { CopLogo } from './CopLogo';
 
 export function CopNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -20,14 +21,14 @@ export function CopNav() {
     <header className={`cop-nav${scrolled ? ' scrolled' : ''}`}>
       <div className="wrap">
         <Link href="/" className="cop-logo" aria-label={`${BRAND.name} home`}>
-          <i />
+          <CopLogo size={32} title="" />
           <span>{BRAND.name}<small>{BRAND.tagline}</small></span>
         </Link>
         <nav className="cop-nav-links" aria-label="Communities">
           <Link href="/" aria-current={cur('/')}>Explore</Link>
           <Link href="/communities/gurgaon/running">Run clubs</Link>
-          <Link href="/communities/gurgaon/sports">Sports</Link>
-          <Link href="/communities/gurgaon/books">Reading</Link>
+          <Link href="/creators" aria-current={cur('/creators')}>Creators</Link>
+          <Link href="/causes" aria-current={cur('/causes')}>Causes</Link>
           <Link href="/repos" aria-current={cur('/repos')}>Git 50k Repos</Link>
           <Link href="/startups" aria-current={cur('/startups')}>Startup map</Link>
           <Link href="/communities/corporate-events" aria-current={cur('/communities/corporate-events')} className="teams">Corporate events <span className="new">new</span></Link>

@@ -8,6 +8,7 @@ import { CATEGORY_META, PLATFORM_LABEL, formatKm, type Scored, whereLabel } from
 import { Mark } from './Mark';
 import { CAT_EMOJI } from './emoji';
 import { CardPhoto } from './CardPhoto';
+import { VerifiedBadge } from './VerifiedBadge';
 
 export function priceLabel(c: Scored): string {
   switch (c.pricing.type) {
@@ -66,7 +67,7 @@ export function CommunityCard({ c, saved, onSave, onToast, index = 0 }: {
       <div className="head">
         <span className="mark"><Mark c={c} size={48} /></span>
         <div className="ttl">
-          <h3><Link href={detail}>{c.name}</Link></h3>
+          <h3><Link href={detail}>{c.name}</Link> <VerifiedBadge c={c} size={17} /></h3>
           <div className="sub">
             <span><MapPin size={11} style={{ display: 'inline', verticalAlign: '-1px' }} /> {whereLabel(c)}</span>
             {c.km != null && <span className="dist">· {formatKm(c.km)}</span>}

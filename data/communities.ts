@@ -27,7 +27,7 @@ export type CommunityCategory =
 
 export type JoinPlatform =
   | 'whatsapp' | 'instagram' | 'meetup' | 'luma' | 'misfits' | 'strava'
-  | 'website' | 'telegram' | 'hangout' | 'discord' | 'reddit' | 'facebook' | 'other';
+  | 'website' | 'telegram' | 'hangout' | 'discord' | 'reddit' | 'facebook' | 'x' | 'other';
 
 export type Community = {
   id: string;
@@ -52,6 +52,8 @@ export type Community = {
   join: { url: string; platform: JoinPlatform; cta: string };
   links: { instagram?: string; website?: string; meetup?: string; strava?: string; luma?: string; whatsapp?: string; facebook?: string };
   source: { url: string; verifiedOn: string; activitySignal: string };
+  /** Our own check of the join link: opened on `on`, worked, with what the platform showed (members, last post). */
+  linkCheck?: { ok: boolean; on: string; members?: string; evidence?: string };
   status: 'approved' | 'unverified';
   featured?: boolean;
   imageUrl: string | null;

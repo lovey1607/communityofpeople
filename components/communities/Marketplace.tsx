@@ -11,10 +11,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
 import {
-  Search, X, SlidersHorizontal, LocateFixed, Map as MapIcon, ChevronRight, Layers, LayoutGrid,
+  Search, X, SlidersHorizontal, LocateFixed, MapPin, Map as MapIcon, ChevronRight, Layers, LayoutGrid,
 } from 'lucide-react';
 import {
-  CATEGORY_META, CATEGORY_ORDER, WORLD_REGIONS, CITY_COUNTRY, isWorldCity, cityLabel, AREAS, CITY_CENTRES, CITY_GROUPS, DEFAULT_FILTERS, METRO_CITIES, ALL_CITIES,
+  CATEGORY_META, CATEGORY_ORDER, distanceKm, WORLD_REGIONS, CITY_COUNTRY, isWorldCity, cityLabel, AREAS, CITY_CENTRES, CITY_GROUPS, DEFAULT_FILTERS, METRO_CITIES, ALL_CITIES,
   JOIN_FILTER_OPTIONS, applyFilters, inCity, categoriesWithListings, filtersToParams, activeFilterCount, nearestCity, PLATFORM_LABEL,
   type Filters, type Origin, type CommunityCategory, type Scored, type Community,
 } from '@/lib/communities';
@@ -67,7 +67,11 @@ export function Marketplace({ initial, lockCity = false, title, all, cityCounts:
       const s = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
       if (Array.isArray(s)) setSaved(new Set(s));
       const o = JSON.parse(localStorage.getItem(ORIGIN_KEY) || 'null');
-      if (o && typeof o.lat === 'number') { setOrigin(o); setOriginKind(o.kind ?? 'area'); }
+      // Only restore a saved spot if it's in (or near) the city on screen — a spot
+      // saved while browsing Singapore must not follow you back to Gurgaon.
+      const centre = CITY_CENTRES[initial.city];
+      if (o && typeof o.lat === 'number' && centre && distanceKm(o.lat, o.lng, centre.lat, centre.lng) <= 80) { setOrigin(o); setOriginKind(o.kind ?? 'area'); }
+      else if (o) localStorage.removeItem(ORIGIN_KEY);
     } catch { /* storage unavailable */ }
     setHydrated(true);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -271,16 +275,12 @@ export function Marketplace({ initial, lockCity = false, title, all, cityCounts:
                   {f.q && <button type="button" className="clear" aria-label="Clear search" onClick={() => update({ q: '' })}><X size={14} /></button>}
                 </label>
               </div>
-              {origin ? (
-                <div className="cop-ask on">
-                  <button type="button" className="cop-locbtn" onClick={() => setLocOpen(true)}><span aria-hidden="true">📍</span> Near <b>{origin.label}</b> <small>change</small></button>
-                </div>
-              ) : (
-                <div className="cop-ask" role="group" aria-label="Set your location">
-                  <button type="button" className="cop-locbtn hot" onClick={() => locate(false)} disabled={geo.busy}><LocateFixed size={15} /> {geo.busy ? 'Finding…' : 'Use my location'}</button>
-                  <button type="button" className="cop-locbtn" onClick={() => setLocOpen(true)}>Pick area</button>
-                </div>
-              )}
+              <div className="cop-ask" role="group" aria-label="Choose a city">
+                <CityJump current={f.city} counts={cityCounts} onPick={pickCity} />
+                <button type="button" className="cop-locbtn hot" onClick={() => locate(false)} disabled={geo.busy} title="Use my location">
+                  <LocateFixed size={15} /> <span className="lbl">{geo.busy ? 'Finding…' : origin?.label === 'your location' ? 'Near me ✓' : 'Near me'}</span>
+                </button>
+              </div>
             </div>
             <div className="cop-quick" aria-label="Popular searches">
               {['pickleball', 'women only', 'singles', 'board games', 'run club', 'free'].map((q) => (
@@ -579,6 +579,49 @@ function CityPicker({ current, onPick, counts: CITY_COUNT }: { current: string; 
         );
       })}
     </>
+  );
+}
+
+// ─── Hero city search: type any city or country, jump straight there ──────
+function CityJump({ current, counts, onPick }: { current: string; counts: Map<string, number>; onPick: (city: string) => void }) {
+  const [q, setQ] = useState('');
+  const [open, setOpen] = useState(false);
+  const [hi, setHi] = useState(0);
+  const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
+  const n = norm(q.trim());
+  const list = useMemo(() => {
+    const regionOf = (c: string) => Object.entries(WORLD_REGIONS).find(([, cs]) => cs.includes(c))?.[0] ?? 'India';
+    const pool = ALL_CITIES.filter((c) => (counts.get(c) ?? 0) > 0);
+    const hits = n ? pool.filter((c) => norm(c).includes(n) || norm(CITY_COUNTRY[c] ?? 'india').includes(n) || norm(regionOf(c)).includes(n)) : pool.slice(0, 8);
+    return hits.sort((a, b) => Number(!norm(a).startsWith(n)) - Number(!norm(b).startsWith(n)) || (counts.get(b) ?? 0) - (counts.get(a) ?? 0)).slice(0, 8);
+  }, [n, counts]); // eslint-disable-line react-hooks/exhaustive-deps
+  const go = (c: string) => { setQ(''); setOpen(false); onPick(c); };
+  return (
+    <div className="cop-cityjump" onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false); }}>
+      <label>
+        <MapPin size={16} aria-hidden="true" />
+        <span className="sr">Search a city or country</span>
+        <input value={q} placeholder={cityLabel(current)} onFocus={() => setOpen(true)} role="combobox" aria-expanded={open} aria-controls="cop-cityjump-list" aria-autocomplete="list"
+          onChange={(e) => { setQ(e.target.value); setOpen(true); setHi(0); }}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowDown') { e.preventDefault(); setHi((h) => Math.min(h + 1, list.length - 1)); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); setHi((h) => Math.max(h - 1, 0)); }
+            else if (e.key === 'Enter' && list[hi]) { e.preventDefault(); go(list[hi]); }
+            else if (e.key === 'Escape') setOpen(false);
+          }} />
+      </label>
+      {open && (
+        <ul id="cop-cityjump-list" role="listbox">
+          {list.length ? list.map((c, i) => (
+            <li key={c} role="option" aria-selected={i === hi}>
+              <button type="button" className={i === hi ? 'on' : ''} onMouseEnter={() => setHi(i)} onClick={() => go(c)}>
+                <b>{c}</b> <small>{CITY_COUNTRY[c] ?? 'India'}</small><i>{counts.get(c) ?? 0}</i>
+              </button>
+            </li>
+          )) : <li className="none">No city matches “{q}” yet — try a country, e.g. “Japan”.</li>}
+        </ul>
+      )}
+    </div>
   );
 }
 
