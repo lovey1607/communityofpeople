@@ -5,11 +5,20 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { BRAND } from '@/lib/communities';
+import { Menu, X } from 'lucide-react';
 import { CopLogo } from './CopLogo';
 
 export function CopNav() {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
   const path = usePathname();
+  useEffect(() => { setOpen(false); }, [path]);
+  useEffect(() => {
+    if (!open) return;
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    addEventListener('keydown', esc);
+    return () => removeEventListener('keydown', esc);
+  }, [open]);
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 8);
     on();
@@ -18,13 +27,13 @@ export function CopNav() {
   }, []);
   const cur = (p: string) => (path === p ? 'page' : undefined);
   return (
-    <header className={`cop-nav${scrolled ? ' scrolled' : ''}`}>
+    <header className={`cop-nav${scrolled ? ' scrolled' : ''}${open ? ' open' : ''}`}>
       <div className="wrap">
         <Link href="/" className="cop-logo" aria-label={`${BRAND.name} home`}>
           <CopLogo size={32} title="" />
           <span>{BRAND.name}<small>{BRAND.tagline}</small></span>
         </Link>
-        <nav className="cop-nav-links" aria-label="Communities">
+        <nav id="cop-nav-links" className="cop-nav-links" aria-label="Communities" onClick={(e) => { if ((e.target as HTMLElement).closest('a')) setOpen(false); }}>
           <Link href="/" aria-current={cur('/')}>Explore</Link>
           <Link href="/communities/gurgaon/running">Run clubs</Link>
           <Link href="/creators" aria-current={cur('/creators')}>Creators</Link>
@@ -33,7 +42,12 @@ export function CopNav() {
           <Link href="/startups" aria-current={cur('/startups')}>Startup map</Link>
           <Link href="/communities/corporate-events" aria-current={cur('/communities/corporate-events')} className="teams">Corporate events <span className="new">new</span></Link>
         </nav>
-        <Link href="/communities/submit" className="cop-btn cop-btn-primary cop-btn-sm">List a community</Link>
+        <div className="cop-nav-end">
+          <Link href="/communities/submit" className="cop-btn cop-btn-primary cop-btn-sm">List a community</Link>
+          <button type="button" className="cop-burger" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="cop-nav-links" onClick={() => setOpen((o) => !o)}>
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
     </header>
   );
