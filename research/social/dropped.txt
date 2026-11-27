@@ -41,6 +41,10 @@ media/news/listing page, not a community: Punekar — https://disboard.org/serve
 media/news/listing page, not a community: MEHFIL Hyderabad — https://disboard.org/server/join/1553292319338405978
 media/news/listing page, not a community: Things2do Hyderabad — https://www.instagram.com/thingstodoinhyderabad/
 media/news/listing page, not a community: Pune Tech Community — https://www.linkedin.com/company/punetechcommunity
+duplicate (same name & city, second link): Hyderabad Gaming Freaks — https://discord.com/invite/hyderabad-gaming-freaks-466603176192376842
+duplicate: r/BangaloreMeetups — https://www.reddit.com/r/BangaloreMeetups/
+duplicate: r/mumbaimeetups — https://www.reddit.com/r/mumbaimeetups/
+duplicate: Delhi Run Collective — https://delhiruncollective.com/
 link not opened by researcher: Bangkok Startup Association public demo nights — https://bkkstartup.com/events
 link not opened by researcher: Bangkok Startup Association founder dinners — https://app.bkkstartup.com/sign-up
 link not opened by researcher: Startup Grind Bangkok BBB Talk — https://www.startupgrind.com/events/details/startup-grind-bangkok-presents-bangkoks-bbb-talk-5-navigating-crisis-entrepreneurship-and-resilience/

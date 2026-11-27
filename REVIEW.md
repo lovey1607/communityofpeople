@@ -225,3 +225,10 @@ from it when you're happy.
 - **Startup map**: filters for India / outside India, country, city and top-city chips; all filters live in the URL.
 - **Brand**: new logo, favicon and OG image (`public/brand/`).
 - **Security**: see `research/SECURITY-REVIEW.md`.
+
+## v13 — 27 Nov 2026
+- **City search rebuilt**: the hero shows your city as one button; it opens a search palette (centred on desktop, full sheet on phones) with type-ahead over cities, countries, regions and old names (Gurugram, Bangalore, Bombay), "use my current location", recent and popular cities, Gurgaon areas and a region browser. Fixes the dropdown that slid under the platform dock.
+- **Nearest first everywhere**: Creators, Causes and the Startup map have a location bar (city picker + Near me). Lists sort by distance from your city; the choice is shared with the home page through the `cop_city` cookie.
+- **Research**: 13 more city communities (Discord servers with member counts we opened, Reddit meetup subreddits, Bengaluru/Gurgaon run clubs from RunRadar). Reddit and directory-listed clubs are listed without the seal because we could not open them ourselves. Cost: about 30 Firecrawl credits (searches plus metadata-only page loads).
+- **Agent-Reach** (github.com/Panniantong/Agent-Reach) was installed and tried. In the cloud sandbox its no-login search and read backends (Exa, Jina) are blocked, and its WhatsApp/Instagram/Reddit/X channels need a logged-in browser session, which we don't use for scraping.
+- Share text and OG image updated site-wide.

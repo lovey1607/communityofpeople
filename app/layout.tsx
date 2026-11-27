@@ -12,15 +12,18 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import { SessionProvider } from '@/components/SessionProvider';
 
 export const metadata: Metadata = {
-  title: 'Community of People — find run clubs, sports groups, book clubs & more near you',
+  metadataBase: new URL(process.env.APP_URL || 'https://communityofpeople.com'),
+  title: 'Community of People — find your people near you',
   description:
-    'A listing marketplace of real, active communities across Indian cities — with a direct link to join each one. Sibling to Community of Employees, the team-outing marketplace at /teams.',
-  keywords: 'communities, run clubs, sports groups, book clubs, meetups, Gurgaon, Delhi NCR, Mumbai, Bengaluru, Jaipur',
+    'Real, active communities on WhatsApp, Telegram, Discord, Instagram, Reddit and Meetup — in 98 cities, plus creator-run groups and causes. One tap to join.',
+  keywords: 'communities, run clubs, whatsapp groups, telegram groups, discord servers, creator communities, meetups, Gurgaon, Delhi NCR, Mumbai, Bengaluru, Jaipur',
   openGraph: {
     title: 'Community of People — find your people',
-    description: 'Run clubs, sports, reading, founders, board games. Real communities, one tap to join.',
+    description: 'Run clubs, creators’ communities, causes and city groups on WhatsApp, Telegram, Discord and more. Real communities, one tap to join.',
     type: 'website',
+    images: ['/brand/cop-og.png'],
   },
+  twitter: { card: 'summary_large_image', images: ['/brand/cop-og.png'] },
 };
 
 export default function RootLayout({

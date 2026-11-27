@@ -11,10 +11,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
 import {
-  Search, X, SlidersHorizontal, LocateFixed, MapPin, Map as MapIcon, ChevronRight, Layers, LayoutGrid,
+  Search, X, SlidersHorizontal, LocateFixed, MapPin, Map as MapIcon, ChevronRight, ChevronDown, Layers, LayoutGrid,
 } from 'lucide-react';
 import {
-  CATEGORY_META, CATEGORY_ORDER, distanceKm, WORLD_REGIONS, CITY_COUNTRY, isWorldCity, cityLabel, AREAS, CITY_CENTRES, CITY_GROUPS, DEFAULT_FILTERS, METRO_CITIES, ALL_CITIES,
+  CATEGORY_META, CATEGORY_ORDER, distanceKm, CITY_COUNTRY, AREAS, CITY_CENTRES, CITY_GROUPS, DEFAULT_FILTERS,
   JOIN_FILTER_OPTIONS, applyFilters, inCity, categoriesWithListings, filtersToParams, activeFilterCount, nearestCity, PLATFORM_LABEL,
   type Filters, type Origin, type CommunityCategory, type Scored, type Community,
 } from '@/lib/communities';
@@ -26,6 +26,7 @@ import { SwipeDeck } from './SwipeDeck';
 import { CursorBuddy, burst } from './CursorBuddy';
 import { CAT_EMOJI } from './emoji';
 import { PlatformDock } from './PlatformDock';
+import { CitySearch } from './CitySearch';
 
 
 const SAVED_KEY = 'cop:saved';
@@ -181,6 +182,7 @@ export function Marketplace({ initial, lockCity = false, title, all, cityCounts:
     setLocOpen(false);
   };
   const pickCity = (city: string) => {
+    setLocOpen(false);
     const c = CITY_CENTRES[city];
     persistOrigin({ lat: c.lat, lng: c.lng, label: `${city} (centre)` }, 'city');
     if (city === f.city) { setF((x) => ({ ...x, sort: 'nearest' })); return; }
@@ -276,7 +278,11 @@ export function Marketplace({ initial, lockCity = false, title, all, cityCounts:
                 </label>
               </div>
               <div className="cop-ask" role="group" aria-label="Choose a city">
-                <CityJump current={f.city} counts={cityCounts} onPick={pickCity} />
+                <button type="button" className="cop-citybtn" onClick={() => setLocOpen(true)} aria-haspopup="dialog" aria-label={`City: ${f.city}. Change city`}>
+                  <MapPin size={18} aria-hidden="true" />
+                  <span className="txt"><b>{f.city}</b><small>{CITY_COUNTRY[f.city] ?? 'India'} · {cityCounts.get(f.city) ?? 0} communities</small></span>
+                  <span className="chg">Change <ChevronDown size={15} aria-hidden="true" /></span>
+                </button>
                 <button type="button" className="cop-locbtn hot" onClick={() => locate(false)} disabled={geo.busy} title="Use my location">
                   <LocateFixed size={15} /> <span className="lbl">{geo.busy ? 'Finding…' : origin?.label === 'your location' ? 'Near me ✓' : 'Near me'}</span>
                 </button>
@@ -432,24 +438,19 @@ export function Marketplace({ initial, lockCity = false, title, all, cityCounts:
       {/* ─── Location picker ─── */}
       <AnimatePresence>
         {locOpen && (
-          <Overlay onClose={() => setLocOpen(false)} title="Where should we look?" reduce={!!reduce}>
-            <div className="cop-locpick">
-              <div className="geo">
-                <button type="button" className="cop-btn cop-btn-accent cop-btn-sm" onClick={() => { locate(false); }} disabled={geo.busy}><LocateFixed size={14} /> Use my location</button>
-                <span className="status">{geo.busy && <span className="cop-spin" />}{geo.msg ?? 'We only use it to sort by distance. Nothing is stored online.'}</span>
-              </div>
+          <Overlay onClose={() => setLocOpen(false)} title="Choose your city" reduce={!!reduce} center>
+            <CitySearch current={f.city} counts={cityCounts} onPick={pickCity} onLocate={() => locate(false)} geoBusy={geo.busy} geoMsg={geo.msg}>
               {AREAS.some((a) => a.city === f.city) && (
-                <div className="cop-fgroup">
-                  <h4>Area in {f.city}</h4>
+                <section className="cs-sec">
+                  <h4>Areas in {f.city}</h4>
                   <div className="areas">
                     {AREAS.filter((a) => a.city === f.city).map((a) => (
                       <button key={a.label} type="button" className={origin?.label === a.label ? 'on' : ''} onClick={() => pickArea(a)}>{a.label}</button>
                     ))}
                   </div>
-                </div>
+                </section>
               )}
-              <CityPicker current={f.city} onPick={pickCity} counts={cityCounts} />
-            </div>
+            </CitySearch>
           </Overlay>
         )}
         {catsOpen && (
@@ -531,102 +532,8 @@ export function Marketplace({ initial, lockCity = false, title, all, cityCounts:
   );
 }
 
-// ─── City picker: metros as chips, everything else searchable ─────
-
-function CityPicker({ current, onPick, counts: CITY_COUNT }: { current: string; onPick: (city: string) => void; counts: Map<string, number> }) {
-  const [q, setQ] = useState('');
-  const norm = (s: string) => s.toLowerCase();
-  const others = ALL_CITIES.filter((c) => !METRO_CITIES.includes(c) && !isWorldCity(c) && (CITY_COUNT.get(c) ?? 0) > 0);
-  const match = (c: string) => !q || norm(c).includes(norm(q));
-  return (
-    <>
-      <div className="cop-fgroup" id="cop-region-India">
-        <h4>India · metros</h4>
-        <input className="input-base" type="search" placeholder={`Search ${ALL_CITIES.length} cities or countries…`} value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search cities" />
-        <div className="cop-regions" role="navigation" aria-label="Jump to region">
-          {['India', ...Object.keys(WORLD_REGIONS)].map((r) => (
-            <button key={r} type="button" onClick={() => document.getElementById(`cop-region-${r.replace(/\W+/g, '-')}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>{r === 'India' ? '🇮🇳 India' : r}</button>
-          ))}
-        </div>
-        <div className="cities" style={{ marginTop: '.6rem' }}>
-          {METRO_CITIES.filter(match).map((city) => (
-            <button key={city} type="button" className="cop-pill" aria-pressed={current === city} onClick={() => onPick(city)}>{city} <span className="n" style={{ color: 'var(--muted)', fontWeight: 500 }}>{CITY_COUNT.get(city) ?? 0}</span></button>
-          ))}
-        </div>
-      </div>
-      {others.some(match) && (
-        <div className="cop-fgroup">
-          <h4>More cities in India</h4>
-          <div className="areas">
-            {others.filter(match).map((city) => (
-              <button key={city} type="button" className={current === city ? 'on' : ''} onClick={() => onPick(city)}>{city} <span style={{ color: 'var(--muted)' }}>· {CITY_COUNT.get(city) ?? 0}</span></button>
-            ))}
-          </div>
-        </div>
-      )}
-      {Object.entries(WORLD_REGIONS).map(([region, cities]) => {
-        const list = cities.filter((c) => (CITY_COUNT.get(c) ?? 0) > 0 && (match(c) || match(CITY_COUNTRY[c] ?? '') || match(region)));
-        if (!list.length) return null;
-        return (
-          <div key={region} className="cop-fgroup cop-world" id={`cop-region-${region.replace(/\W+/g, '-')}`}>
-            <h4><span aria-hidden="true">🌍</span> {region}</h4>
-            <div className="areas">
-              {list.map((city) => (
-                <button key={city} type="button" className={current === city ? 'on' : ''} onClick={() => onPick(city)} title={cityLabel(city)}>{city} <span style={{ color: 'var(--muted)' }}>· {CITY_COUNT.get(city) ?? 0}</span></button>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-    </>
-  );
-}
-
-// ─── Hero city search: type any city or country, jump straight there ──────
-function CityJump({ current, counts, onPick }: { current: string; counts: Map<string, number>; onPick: (city: string) => void }) {
-  const [q, setQ] = useState('');
-  const [open, setOpen] = useState(false);
-  const [hi, setHi] = useState(0);
-  const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
-  const n = norm(q.trim());
-  const list = useMemo(() => {
-    const regionOf = (c: string) => Object.entries(WORLD_REGIONS).find(([, cs]) => cs.includes(c))?.[0] ?? 'India';
-    const pool = ALL_CITIES.filter((c) => (counts.get(c) ?? 0) > 0);
-    const hits = n ? pool.filter((c) => norm(c).includes(n) || norm(CITY_COUNTRY[c] ?? 'india').includes(n) || norm(regionOf(c)).includes(n)) : pool.slice(0, 8);
-    return hits.sort((a, b) => Number(!norm(a).startsWith(n)) - Number(!norm(b).startsWith(n)) || (counts.get(b) ?? 0) - (counts.get(a) ?? 0)).slice(0, 8);
-  }, [n, counts]); // eslint-disable-line react-hooks/exhaustive-deps
-  const go = (c: string) => { setQ(''); setOpen(false); onPick(c); };
-  return (
-    <div className="cop-cityjump" onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false); }}>
-      <label>
-        <MapPin size={16} aria-hidden="true" />
-        <span className="sr">Search a city or country</span>
-        <input value={q} placeholder={cityLabel(current)} onFocus={() => setOpen(true)} role="combobox" aria-expanded={open} aria-controls="cop-cityjump-list" aria-autocomplete="list"
-          onChange={(e) => { setQ(e.target.value); setOpen(true); setHi(0); }}
-          onKeyDown={(e) => {
-            if (e.key === 'ArrowDown') { e.preventDefault(); setHi((h) => Math.min(h + 1, list.length - 1)); }
-            else if (e.key === 'ArrowUp') { e.preventDefault(); setHi((h) => Math.max(h - 1, 0)); }
-            else if (e.key === 'Enter' && list[hi]) { e.preventDefault(); go(list[hi]); }
-            else if (e.key === 'Escape') setOpen(false);
-          }} />
-      </label>
-      {open && (
-        <ul id="cop-cityjump-list" role="listbox">
-          {list.length ? list.map((c, i) => (
-            <li key={c} role="option" aria-selected={i === hi}>
-              <button type="button" className={i === hi ? 'on' : ''} onMouseEnter={() => setHi(i)} onClick={() => go(c)}>
-                <b>{c}</b> <small>{CITY_COUNTRY[c] ?? 'India'}</small><i>{counts.get(c) ?? 0}</i>
-              </button>
-            </li>
-          )) : <li className="none">No city matches “{q}” yet — try a country, e.g. “Japan”.</li>}
-        </ul>
-      )}
-    </div>
-  );
-}
-
 // ─── Overlay: bottom sheet on mobile, side panel on desktop ──────
-function Overlay({ title, children, footer, onClose, reduce }: { title: string; children: React.ReactNode; footer?: React.ReactNode; onClose: () => void; reduce: boolean }) {
+function Overlay({ title, children, footer, onClose, reduce, center = false }: { title: string; children: React.ReactNode; footer?: React.ReactNode; onClose: () => void; reduce: boolean; center?: boolean }) {
   // Overlays only mount after a click, so reading matchMedia here can't cause a hydration mismatch.
   const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 820px)').matches);
   useEffect(() => {
@@ -640,11 +547,13 @@ function Overlay({ title, children, footer, onClose, reduce }: { title: string; 
   }, [onClose]);
   const panelAnim = mobile
     ? { initial: { y: '100%' }, animate: { y: 0 }, exit: { y: '100%' } }
-    : { initial: { x: '100%' }, animate: { x: 0 }, exit: { x: '100%' } };
+    : center
+      ? { initial: { opacity: 0, y: -16, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, exit: { opacity: 0, y: -10, scale: 0.98 } }
+      : { initial: { x: '100%' }, animate: { x: 0 }, exit: { x: '100%' } };
   return (
     <>
       <motion.div className="cop-scrim" onClick={onClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} />
-      <motion.div className={mobile ? 'cop-sheet' : 'cop-desk-panel'} role="dialog" aria-modal="true" aria-label={title}
+      <motion.div className={mobile ? `cop-sheet${center ? ' tall' : ''}` : center ? 'cop-cmdk' : 'cop-desk-panel'} role="dialog" aria-modal="true" aria-label={title}
         {...(reduce ? {} : panelAnim)} transition={{ type: 'spring', stiffness: 380, damping: 36 }}>
         {mobile && <div className="grab" />}
         <header><h2>{title}</h2><button type="button" className="cop-xbtn" aria-label="Close" onClick={onClose}><X size={16} /></button></header>

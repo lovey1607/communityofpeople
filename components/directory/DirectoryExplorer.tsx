@@ -8,6 +8,8 @@ import { ExternalLink, Search, X } from 'lucide-react';
 import { VerifiedSeal } from '@/components/communities/VerifiedBadge';
 import { VERIFY_FRESH_DAYS } from '@/lib/communities';
 import type { DirItem } from '@/data/directory-types';
+import { NearbyBar } from '@/components/communities/NearbyBar';
+import { placeRank, useNearby } from '@/lib/communities/nearby';
 
 const PLATFORM: Record<string, { label: string; dot: string }> = {
   whatsapp: { label: 'WhatsApp', dot: '#25D366' }, telegram: { label: 'Telegram', dot: '#2AABEE' }, discord: { label: 'Discord', dot: '#5865F2' },
@@ -30,6 +32,9 @@ export function DirectoryExplorer({ items, facets, facetLabel, placeholder, show
   const [where, setWhere] = useState('');
   const [onlyVerified, setOnlyVerified] = useState(false);
   const [ready, setReady] = useState(false);
+  const nb = useNearby();
+  const [nearOn, setNearOn] = useState(true);
+  const rank = (i: DirItem) => (nearOn ? placeRank(i.where, nb.city, nb.country) : 0);
 
   useEffect(() => {
     const p = new URLSearchParams(location.search);
@@ -64,13 +69,15 @@ export function DirectoryExplorer({ items, facets, facetLabel, placeholder, show
         if (!terms.every((w) => hay.includes(w))) return false;
       }
       return true;
-    }).sort((a, b) => Number(!!(b.linkOk && fresh(b.checkedOn))) - Number(!!(a.linkOk && fresh(a.checkedOn))));
-  }, [items, q, facet, platform, where, onlyVerified]);
+    }).sort((a, b) => rank(b) - rank(a) || Number(!!(b.linkOk && fresh(b.checkedOn))) - Number(!!(a.linkOk && fresh(a.checkedOn))));
+  }, [items, q, facet, platform, where, onlyVerified, nb.city, nearOn]); // eslint-disable-line react-hooks/exhaustive-deps
+  const nearCount = useMemo(() => (nb.city ? items.filter((i) => placeRank(i.where, nb.city, nb.country) >= 3).length : 0), [items, nb.city, nb.country]);
 
   const any = q || facet || platform || where || onlyVerified;
   return (
     <section className="dir">
       <div className="wrap">
+        <NearbyBar nb={nb} on={nearOn} setOn={setNearOn} nearCount={nearCount} />
         <div className="dir-tools">
           <label className="dir-q">
             <Search size={17} aria-hidden="true" />
@@ -115,7 +122,7 @@ export function DirectoryExplorer({ items, facets, facetLabel, placeholder, show
                 {i.by && <p className="by">by {i.byUrl ? <a href={i.byUrl} target="_blank" rel="noopener noreferrer nofollow">{i.by}</a> : i.by}</p>}
                 <p className="desc">{i.description}</p>
                 <ul className="facts">
-                  <li>📍 {i.where}</li>
+                  <li>📍 {i.where}{nearOn && placeRank(i.where, nb.city, nb.country) >= 3 && <span className="near"> · near you</span>}</li>
                   {i.members && <li>👥 {i.members}</li>}
                   {showPrice && i.price && <li>{i.price === 'free' ? '🆓 Free' : `💳 ${i.price}`}</li>}
                   {i.ledBy && <li>🧭 Led by {i.ledBy}</li>}

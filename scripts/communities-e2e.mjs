@@ -188,12 +188,12 @@ ok('world: SF page ships only its own slice (no Gurgaon listings)', !sfHtml.incl
 ok('world: pan-India online groups stay out of SF', !(await p.textContent('main')).includes('pan-India'));
 await p.screenshot({ path: `${OUT}14-world-sf.png` });
 await p.click('.cop-loc .change'); await p.waitForTimeout(400);
-ok('world: city picker has regions', await p.isVisible('.cop-world h4:has-text("North America")') && await p.isVisible('.cop-world h4:has-text("Middle East")'));
+ok('world: city picker has regions', await p.isVisible('.cs-tabs button:has-text("North America")') && await p.isVisible('.cs-tabs button:has-text("Middle East")'));
 await p.screenshot({ path: `${OUT}15-world-picker.png` });
 await p.fill('.cop-locpick input[type="search"]', 'japan'); await p.waitForTimeout(300);
-ok('world: picker search matches countries (japan → Tokyo)', await p.isVisible('.cop-world button:has-text("Tokyo")'));
-await p.fill('.cop-locpick input[type="search"]', '');
-await p.click('.cop-world button:has-text("Singapore")'); await p.waitForURL(/city=Singapore/); await p.waitForTimeout(1500);
+ok('world: picker search matches countries (japan → Tokyo)', await p.isVisible('#cop-cs-results button:has-text("Tokyo")'));
+await p.fill('.cop-locpick input[type="search"]', 'singa'); await p.waitForTimeout(200);
+await p.click('#cop-cs-results button:has-text("Singapore")'); await p.waitForURL(/city=Singapore/); await p.waitForTimeout(1500);
 ok('world: picking Singapore loads Singapore', (await p.textContent('.cop-hero h1')).includes('Singapore') && (await p.$$eval('.cop-card', (e) => e.length)) >= 10);
 await ctx.close();
 [ctx, p] = await page({ width: 1400, height: 900 });
@@ -209,8 +209,13 @@ await p.goto(`${B}/communities?city=Gurgaon`, { waitUntil: 'load' }); await p.wa
 await p.evaluate(() => localStorage.setItem('cop:origin', JSON.stringify({ lat: 1.3521, lng: 103.8198, label: 'Singapore (centre)', kind: 'city' })));
 await p.goto(`${B}/communities?city=Gurgaon`, { waitUntil: 'load' }); await p.waitForTimeout(1200);
 ok('v12: a spot saved in another city does not follow you (no "Singapore" near Gurgaon)', !(await p.textContent('main')).includes('Singapore (centre)'));
-await p.fill('.cop-cityjump input', 'japan'); await p.waitForTimeout(300);
-ok('v12: hero city search matches countries', await p.isVisible('.cop-cityjump li button:has-text("Tokyo")'));
+await p.click('.cop-citybtn'); await p.waitForTimeout(400);
+ok('v13: hero city button opens the city search with the cursor in it', await p.evaluate(() => document.activeElement?.closest('.cs-input') !== null));
+await p.screenshot({ path: `${OUT}16-city-search.png` });
+await p.keyboard.type('gurugram'); await p.waitForTimeout(200);
+ok('v13: old names work (gurugram → Gurgaon)', (await p.textContent('#cop-cs-results li:first-child')).includes('Gurgaon'));
+await p.fill('.cs-input input', 'japan'); await p.waitForTimeout(300);
+ok('v12: hero city search matches countries', await p.isVisible('#cop-cs-results button:has-text("Tokyo")'));
 await p.keyboard.press('Enter'); await p.waitForURL(/city=Tokyo/); await p.waitForTimeout(1200);
 ok('v12: Enter in hero search jumps to the city', (await p.textContent('.cop-hero h1')).includes('Tokyo'));
 await p.goto(`${B}/creators`, { waitUntil: 'load' }); await p.waitForTimeout(800);
@@ -222,7 +227,27 @@ await p.goto(`${B}/causes`, { waitUntil: 'load' }); await p.waitForTimeout(800);
 ok('v12: /causes lists intent groups + start-a-group CTA', (await p.$$eval('.dir-card', (e) => e.length)) >= 10 && await p.isVisible('a:has-text("Start an intent group")'));
 await p.goto(`${B}/startups?scope=india`, { waitUntil: 'load' }); await p.waitForTimeout(800);
 ok('v12: startup map filters by location from the URL', await p.isVisible('.r-chip[aria-pressed="true"]:has-text("India")'));
+await p.goto(`${B}/causes`, { waitUntil: 'load' }); await p.waitForTimeout(800);
+await p.selectOption('.nearby-bar select', 'Bengaluru'); await p.waitForTimeout(300);
+ok('v13: causes sort nearest first (Bengaluru group on top)', (await p.textContent('.dir-card:first-child .facts')).includes('Bengaluru'));
+await p.goto(`${B}/creators`, { waitUntil: 'load' }); await p.waitForTimeout(800);
+ok('v13: city choice carries across pages (creators remembers Bengaluru)', (await p.inputValue('.nearby-bar select')) === 'Bengaluru');
+await p.goto(`${B}/startups`, { waitUntil: 'load' }); await p.waitForTimeout(800);
+ok('v13: startup map sorts nearest first', /Bengaluru/.test(await p.textContent('.grid .s-card:first-child .s-city')));
 ok('v12: nav swaps Sports/Reading for Creators/Causes', await p.isVisible('.cop-nav-links a:has-text("Creators")') && !(await p.isVisible('.cop-nav-links a:has-text("Reading")')));
+await ctx.close();
+
+// ─── v13: phone — city search sheet and new location bars fit the screen ───
+[ctx, p] = await page({ width: 390, height: 844 }, { isMobile: true, hasTouch: true });
+await p.goto(`${B}/communities?city=Gurgaon`, { waitUntil: 'load' }); await p.waitForTimeout(1000);
+await p.click('.cop-citybtn'); await p.waitForTimeout(500);
+ok('v13 mobile: city search opens as a sheet', await p.isVisible('.cop-sheet .cs-input'));
+await p.screenshot({ path: `${OUT}17-mobile-city-search.png` });
+ok('v13 mobile: no sideways scroll with the sheet open', await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+for (const path of ['/creators', '/causes', '/startups']) {
+  await p.goto(`${B}${path}`, { waitUntil: 'load' }); await p.waitForTimeout(600);
+  ok(`v13 mobile: ${path} fits the screen`, await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+}
 await ctx.close();
 
 await b.close();

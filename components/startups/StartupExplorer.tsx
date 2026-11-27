@@ -3,6 +3,8 @@
 // Static dataset compiled from public sources; filtering is client-side.
 import { useEffect, useMemo, useState } from 'react';
 import data from '@/data/startup-map.json';
+import { NearbyBar } from '@/components/communities/NearbyBar';
+import { kmFrom, useNearby } from '@/lib/communities/nearby';
 
 type Entry = {
   n: string; t: string; st: string[]; q: string; qn: string;
@@ -34,6 +36,8 @@ export function StartupExplorer() {
   const [country, setCountry] = useState('');
   const [shown, setShown] = useState(PAGE);
   const [ready, setReady] = useState(false);
+  const nb = useNearby();
+  const [nearOn, setNearOn] = useState(true);
 
   // Filters live in the URL (?city=Bengaluru&type=angel…) so a filtered view can be shared.
   useEffect(() => {
@@ -66,7 +70,7 @@ export function StartupExplorer() {
 
   const list = useMemo(() => {
     const terms = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    return ENTRIES.filter((e) => {
+    const out = ENTRIES.filter((e) => {
       if (type && e.t !== type) return false;
       if (stage && !e.st.includes(stage)) return false;
       if (sector && !e.sc.includes(sector)) return false;
@@ -80,7 +84,10 @@ export function StartupExplorer() {
       }
       return true;
     });
-  }, [q, type, stage, sector, city, sourced, scope, country]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!nearOn || !nb.city) return out;
+    return out.map((e) => [e, kmFrom(nb.city, e.c)] as const).sort((a, b) => a[1] - b[1]).map(([e]) => e);
+  }, [q, type, stage, sector, city, sourced, scope, country, nb.city, nearOn]); // eslint-disable-line react-hooks/exhaustive-deps
+  const nearCount = useMemo(() => (nb.city ? ENTRIES.filter((e) => kmFrom(nb.city, e.c) <= 80).length : 0), [nb.city]);
 
   const anyFilter = Boolean(q || type || stage || sector || city || sourced || scope || country);
   const reset = () => {
@@ -92,6 +99,7 @@ export function StartupExplorer() {
     <>
       <section className="filters">
         <div className="wrap">
+          <NearbyBar nb={nb} on={nearOn} setOn={setNearOn} nearCount={nearCount} />
           <div className="rowlab"><b>What kind of backer?</b></div>
           <div className="chips">
             {TYPES.map((t) => (
@@ -181,6 +189,7 @@ export function StartupExplorer() {
               <Card
                 key={e.n}
                 e={e}
+                km={nearOn && nb.city ? kmFrom(nb.city, e.c) : Infinity}
                 onStage={(s) => { setStage(s); setShown(PAGE); }}
                 onSector={(s) => { setSector(s); setShown(PAGE); }}
               />
@@ -201,14 +210,14 @@ export function StartupExplorer() {
 }
 
 function Card({
-  e, onStage, onSector,
-}: { e: Entry; onStage: (s: string) => void; onSector: (s: string) => void }) {
+  e, onStage, onSector, km = Infinity,
+}: { e: Entry; onStage: (s: string) => void; onSector: (s: string) => void; km?: number }) {
   const t = T[e.t] ?? { emoji: '•', label: e.t };
   return (
     <article className="r-card s-card">
       <div className="r-top">
         <span className="r-cat">{t.emoji} {t.label}</span>
-        <span className="s-city">{e.c}{e.co !== 'India' ? ` · ${e.co}` : ''}</span>
+        <span className="s-city">{e.c}{e.co !== 'India' ? ` · ${e.co}` : ''}{km < 15 ? ' · in your city' : km < 400 ? ` · ${Math.round(km)} km` : ''}</span>
       </div>
       <h3>{e.n}</h3>
 
