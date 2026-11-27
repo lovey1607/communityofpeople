@@ -45,6 +45,7 @@ duplicate (same name & city, second link): Hyderabad Gaming Freaks — https://d
 duplicate: r/BangaloreMeetups — https://www.reddit.com/r/BangaloreMeetups/
 duplicate: r/mumbaimeetups — https://www.reddit.com/r/mumbaimeetups/
 duplicate: Delhi Run Collective — https://delhiruncollective.com/
+duplicate: Vamos Run Club — https://www.instagram.com/vamos_run_club/
 link not opened by researcher: Bangkok Startup Association public demo nights — https://bkkstartup.com/events
 link not opened by researcher: Bangkok Startup Association founder dinners — https://app.bkkstartup.com/sign-up
 link not opened by researcher: Startup Grind Bangkok BBB Talk — https://www.startupgrind.com/events/details/startup-grind-bangkok-presents-bangkoks-bbb-talk-5-navigating-crisis-entrepreneurship-and-resilience/

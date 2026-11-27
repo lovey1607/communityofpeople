@@ -51,7 +51,7 @@ function platformOf(p: string, url: string): DirItem['platform'] {
 
 const CITY_ALIAS: Record<string, string> = {
   bangalore: 'Bengaluru', bengaluru: 'Bengaluru', gurugram: 'Gurgaon', gurgaon: 'Gurgaon', 'new delhi': 'Delhi', delhi: 'Delhi', 'delhi ncr': 'Delhi',
-  ncr: 'Delhi', bombay: 'Mumbai', mumbai: 'Mumbai', 'navi mumbai': 'Navi Mumbai', madras: 'Chennai', calcutta: 'Kolkata', cochin: 'Kochi',
+  ncr: 'Delhi', bombay: 'Mumbai', mumbai: 'Mumbai', 'navi mumbai': 'Navi Mumbai', madras: 'Chennai', calcutta: 'Kolkata', cochin: 'Kochi', trivandrum: 'Thiruvananthapuram', vizag: 'Visakhapatnam', mysore: 'Mysuru', baroda: 'Vadodara',
   'new york city': 'New York', nyc: 'New York', 'san francisco bay area': 'San Francisco', 'bay area': 'San Francisco', sf: 'San Francisco',
   'hong kong sar': 'Hong Kong', 'kuala lumpur (kl)': 'Kuala Lumpur', kl: 'Kuala Lumpur',
 };
