@@ -1,0 +1,49 @@
+UNVERIFIED r/BangaloreMeetups (https://www.reddit.com/r/BangaloreMeetups/)
+UNVERIFIED r/mumbaimeetups (https://www.reddit.com/r/mumbaimeetups/)
+UNVERIFIED r/HyderabadMeet (https://www.reddit.com/r/HyderabadMeet/)
+UNVERIFIED r/DelhiSocialCircle (https://www.reddit.com/r/DelhiSocialCircle/)
+UNVERIFIED r/Jaipur__Meetups (https://www.reddit.com/r/Jaipur__Meetups/)
+VERIFIED Stride Run Club
+REMOVED HSR Run Club (Bengaluru): Strava page 404
+REMOVED Indiranagar Run Club (Bengaluru): Strava page 404
+VERIFIED Jayanagar Jaguars
+REMOVED Adidas Runners Bengaluru (Bengaluru): page returns 500
+VERIFIED ASICS Running Club Bengaluru
+VERIFIED Delhi Run Collective
+VERIFIED RunSpark
+VERIFIED Founders Running Club — Surat
+VERIFIED Awaken Circle
+VERIFIED Hydra Run Club
+VERIFIED CardioClub Surat
+VERIFIED Raftaar Run Club
+VERIFIED Daud Le Run Club
+VERIFIED CAPS Run Club
+VERIFIED Rise & Run Club
+VERIFIED Nagpur Runners
+VERIFIED Nagpur Book Club
+VERIFIED paceHer Run Club
+VERIFIED Tez Run Club
+VERIFIED CRC — Coimbatore Running Club
+VERIFIED Cycology Coimbatore
+REMOVED Freerunners Coimbatore (Coimbatore): site down (503)
+REMOVED eChai Bhopal (Bhopal): redirects to eChai home; no Bhopal page
+VERIFIED Uprun Club
+VERIFIED Noida Extension Runners
+VERIFIED REVO Run Club
+VERIFIED SoleMates Run Club Vizag
+VERIFIED Vamos Run Club
+VERIFIED Premier Run Club (OnlyRuns)
+VERIFIED Patna Run Club
+VERIFIED RunAdda
+VERIFIED Open Road Run Club
+VERIFIED BAE Run Club
+VERIFIED RIZZ Run Club
+VERIFIED ITEN Runners Club
+VERIFIED Travancore Run Club
+VERIFIED Aeternum Run Club
+VERIFIED Runners Brew Crew (RBC)
+VERIFIED Guwahati Run & Rave
+VERIFIED Roadkin Running Club
+VERIFIED Mysuru Cycling Club
+VERIFIED Mysore Run Club
+VERIFIED TiE Mysuru

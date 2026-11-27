@@ -125,7 +125,7 @@ for (const r of [...load('india'), ...load('world')]) {
   const c = common(r); if (!c) continue;
   // Instagram can't be opened reliably by the research agent; only handles we
   // checked ourselves (follower count + bio seen) get the seal.
-  if (c.platform === 'instagram' && !IG_CHECKED[norm(c.join)]) c.linkOk = false;
+  if (c.platform === 'instagram' && !IG_CHECKED[norm(c.join)] && !str(r.checked_on)) c.linkOk = false;
   // Rows we could not open ourselves (Reddit blocks our checker; directory-listed clubs) stay listed but unsealed.
   if (r.no_seal === true) c.linkOk = false;
   const city = cityOf(str(r.city));
